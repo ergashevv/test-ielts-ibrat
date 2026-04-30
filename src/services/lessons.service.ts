@@ -94,12 +94,10 @@ export const lessonsService = {
   list: async (
     practicumId: string,
     moduleId: string,
-  ): Promise<Paginated<ApiLessonSummary>> => {
-    if (apiConfig.useMock) return emptyPage<ApiLessonSummary>();
-    return api.get<Paginated<ApiLessonSummary>>(
-      endpoints.lessons.list(practicumId, moduleId),
-      { params: { limit: 100 } },
-    );
+  ): Promise<ApiLessonSummary[]> => {
+    if (apiConfig.useMock) return [];
+    if (!practicumId || !moduleId) return [];
+    return api.get<ApiLessonSummary[]>(endpoints.lessons.list(practicumId, moduleId));
   },
 
   detail: async (

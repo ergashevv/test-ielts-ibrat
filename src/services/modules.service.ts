@@ -15,11 +15,9 @@ export interface ApiModule {
 }
 
 export const modulesService = {
-  list: async (practicumId: string): Promise<Paginated<ApiModule>> => {
-    if (apiConfig.useMock) return emptyPage<ApiModule>();
-    return api.get<Paginated<ApiModule>>(
-      endpoints.practicums.modules(practicumId),
-      { params: { limit: 100 } },
-    );
+  list: async (practicumId: string): Promise<ApiModule[]> => {
+    if (apiConfig.useMock) return [];
+    if (!practicumId) return [];
+    return api.get<ApiModule[]>(endpoints.practicums.modules(practicumId));
   },
 };

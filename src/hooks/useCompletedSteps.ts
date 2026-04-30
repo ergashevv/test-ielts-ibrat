@@ -34,13 +34,13 @@ export function useCompletedSteps(courseId: CourseId): string[] {
   const practicumId =
     courses?.find((c) => c.id === courseId)?.practicumId ?? "";
 
-  const { data: modulesPage } = useModules(practicumId);
-  const moduleId = modulesPage?.data[0]?._id;
+  const { data: modules } = useModules(practicumId);
+  const moduleId = (modules as any)?.[0]?._id;
 
-  const { data: lessonsPage } = useLessons(practicumId, moduleId);
+  const { data: lessons } = useLessons(practicumId, moduleId);
 
   return useMemo(() => {
-    const apiLessons = lessonsPage?.data ?? [];
+    const apiLessons = (lessons as any) ?? [];
     const effectiveSteps = getEffectiveSteps(courseId);
 
     const apiCompleted: string[] = [];

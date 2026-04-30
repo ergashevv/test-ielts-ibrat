@@ -20,6 +20,7 @@ const createApiClient = (): AxiosInstance => {
     baseURL: apiConfig.baseUrl,
     timeout: apiConfig.timeoutMs,
     headers: { "Content-Type": "application/json" },
+    withCredentials: true,
   });
 
   instance.interceptors.request.use((config) => {
