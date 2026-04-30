@@ -53,11 +53,11 @@ export function useLessonForStep(
   const practicumId =
     courses?.find((c) => c.id === courseId)?.practicumId ?? "";
 
-  const { data: modulesPage, isLoading: modulesLoading } =
+  const { data: modules, isLoading: modulesLoading } =
     useModules(practicumId);
-  const moduleId = modulesPage?.data[0]?._id;
+  const moduleId = (modules as any)?.[0]?._id;
 
-  const { data: lessonsPage, isLoading: lessonsLoading } = useLessons(
+  const { data: lessons, isLoading: lessonsLoading } = useLessons(
     practicumId,
     moduleId,
   );
@@ -65,7 +65,7 @@ export function useLessonForStep(
   const effectiveSteps = getEffectiveSteps(courseId);
   const stepIndex = effectiveSteps.indexOf(stepId);
   const lessonId =
-    stepIndex >= 0 ? lessonsPage?.data[stepIndex]?._id : undefined;
+    stepIndex >= 0 ? (lessons as any)?.[stepIndex]?._id : undefined;
 
   return {
     practicumId,

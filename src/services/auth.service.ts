@@ -58,9 +58,11 @@ export const authService = {
     );
     const { tokens, user } = res;
 
-    // Save tokens using the names found in the response
+    // Save tokens using both our names and backend names for maximum compatibility
     Cookies.set("m_at", tokens.accessToken, { expires: 7, sameSite: "lax" });
     Cookies.set("m_rt", tokens.refreshToken, { expires: 30, sameSite: "lax" });
+    Cookies.set("accessToken", tokens.accessToken, { expires: 7, sameSite: "lax" });
+    Cookies.set("refreshToken", tokens.refreshToken, { expires: 30, sameSite: "lax" });
 
     // If backend doesn't return user, we might need a placeholder or fetch it
     return user || ({ id: "me" } as User);
@@ -78,6 +80,8 @@ export const authService = {
 
     Cookies.set("m_at", tokens.accessToken, { expires: 7, sameSite: "lax" });
     Cookies.set("m_rt", tokens.refreshToken, { expires: 30, sameSite: "lax" });
+    Cookies.set("accessToken", tokens.accessToken, { expires: 7, sameSite: "lax" });
+    Cookies.set("refreshToken", tokens.refreshToken, { expires: 30, sameSite: "lax" });
 
     return user || ({ id: "me" } as User);
   },
@@ -89,6 +93,8 @@ export const authService = {
     } finally {
       Cookies.remove("m_at");
       Cookies.remove("m_rt");
+      Cookies.remove("accessToken");
+      Cookies.remove("refreshToken");
     }
   },
 
