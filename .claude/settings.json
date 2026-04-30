@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__playwright__browser_evaluate",
+      "Bash(tasklist)",
+      "Bash(node -e ' *)",
+      "mcp__playwright__browser_tabs",
+      "mcp__playwright__browser_close"
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+export { tasksService } from "./tasks.service";
+export { coursesService } from "./courses.service";
+export { userService, avatarService } from "./user.service";
+export { authService } from "./auth.service";
+export { progressService } from "./progress.service";
+export { modulesService } from "./modules.service";
+export { practicumsService } from "./practicums.service";
+export { lessonsService } from "./lessons.service";
+export { answersService } from "./answers.service";
+export { streakService } from "./streak.service";
+export { promosService } from "./promos.service";
+export { plansService } from "./plans.service";
+export { notificationsService } from "./notifications.service";
