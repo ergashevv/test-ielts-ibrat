@@ -36,9 +36,12 @@ const createApiClient = (): AxiosInstance => {
     (error) => {
       if (error.response?.status === 401) {
         console.error("Auth Error (401) at:", error.config?.url);
-        Cookies.remove("m_at");
-        Cookies.remove("m_rt");
-        redirectToLogin();
+        // Temporarily disabled automatic logout to avoid redirect loops during debugging
+        // Cookies.remove("m_at");
+        // Cookies.remove("m_rt");
+        // Cookies.remove("accessToken");
+        // Cookies.remove("refreshToken");
+        // redirectToLogin();
       }
       return Promise.reject(normalizeAxiosError(error));
     },
