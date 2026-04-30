@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 import { AuthShell } from "@/components/layout/AuthShell";
 import { useGoogleSignIn, useSendOtp } from "@/hooks/queries/useAuth";
@@ -17,30 +18,41 @@ export default function LoginPage() {
 
   const sendOtp = useSendOtp();
   const googleSignIn = useGoogleSignIn();
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const rawDigits = phoneNumber.replace(/\D/g, "");
     if (rawDigits.length !== 9) return;
 
+    if (!executeRecaptcha) {
+      setErrorMessage("reCAPTCHA is not ready. Please try again.");
+      return;
+    }
+
     setErrorMessage(null);
     const phone = `+998${rawDigits}`;
 
-    sendOtp.mutate(
-      { phone },
-      {
-        onSuccess: () => {
-          router.push(`/login/otp?phone=${encodeURIComponent(phone)}`);
+    try {
+      const captchaToken = await executeRecaptcha("login");
+      sendOtp.mutate(
+        { phone, captcha: captchaToken },
+        {
+          onSuccess: () => {
+            router.push(`/login/otp?phone=${encodeURIComponent(phone)}`);
+          },
+          onError: (err) => {
+            setErrorMessage(
+              err instanceof ApiError
+                ? err.message
+                : "Failed to send OTP. Please try again.",
+            );
+          },
         },
-        onError: (err) => {
-          setErrorMessage(
-            err instanceof ApiError
-              ? err.message
-              : "Failed to send OTP. Please try again.",
-          );
-        },
-      },
-    );
+      );
+    } catch (error) {
+      setErrorMessage("reCAPTCHA execution failed.");
+    }
   };
 
   const handleGoogleSuccess = (response: CredentialResponse) => {

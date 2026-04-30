@@ -13,7 +13,7 @@ export function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
     if (isPublic(pathname)) return NextResponse.next();
 
-    const hasSession = req.cookies.has("token");
+    const hasSession = req.cookies.has("m_at");
     if (!hasSession) {
         const loginUrl = new URL("/login", req.url);
         loginUrl.searchParams.set("redirect", pathname);

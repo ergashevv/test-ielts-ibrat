@@ -39,14 +39,14 @@ const fromApi = (u: ApiUser): User => ({
 export const userService = {
   me: async (): Promise<User> => {
     if (apiConfig.useMock) return mockUser;
-    const res = await api.get<Envelope<ApiUser>>(endpoints.user.me);
-    return fromApi(res.data);
+    const res = await api.get<ApiUser>(endpoints.user.me);
+    return fromApi(res);
   },
 
   update: async (id: string, payload: UpdateUserPayload): Promise<User> => {
     if (apiConfig.useMock) return { ...mockUser, ...payload };
-    const res = await api.put<Envelope<ApiUser>>(endpoints.user.update(id), payload);
-    return fromApi(res.data);
+    const res = await api.put<ApiUser>(endpoints.user.update(id), payload);
+    return fromApi(res);
   },
 
   delete: async (id: string): Promise<void> => {
@@ -67,10 +67,10 @@ export const avatarService = {
     }
     const form = new FormData();
     form.append("file", file);
-    const res = await api.post<Envelope<AvatarResource>>(endpoints.avatar.create, form, {
+    const res = await api.post<AvatarResource>(endpoints.avatar.create, form, {
       headers: { "Content-Type": "multipart/form-data" },
     });
-    return res.data;
+    return res;
   },
   replace: async (id: string, file: File): Promise<AvatarResource> => {
     if (apiConfig.useMock) {
@@ -78,11 +78,11 @@ export const avatarService = {
     }
     const form = new FormData();
     form.append("file", file);
-    const res = await api.put<Envelope<AvatarResource>>(
+    const res = await api.put<AvatarResource>(
       endpoints.avatar.update(id),
       form,
       { headers: { "Content-Type": "multipart/form-data" } },
     );
-    return res.data;
+    return res;
   },
 };

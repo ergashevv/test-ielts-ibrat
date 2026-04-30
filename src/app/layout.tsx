@@ -18,6 +18,7 @@ import { QueryProvider } from "@/providers/QueryProvider";
 import { GoogleAuthProvider } from "@/providers/GoogleAuthProvider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ToastProvider } from "@/components/ui/Toast";
+import { CaptchaProvider } from "@/providers/CaptchaProvider";
 
 export default function RootLayout({
   children,
@@ -31,11 +32,11 @@ export default function RootLayout({
           <QueryProvider>
             <ToastProvider>
               <GoogleAuthProvider>
-                <CourseProgressProvider>
-                  <StreakProvider>
-                    {children}
-                  </StreakProvider>
-                </CourseProgressProvider>
+                <CaptchaProvider>
+                  <CourseProgressProvider>
+                    <StreakProvider>{children}</StreakProvider>
+                  </CourseProgressProvider>
+                </CaptchaProvider>
               </GoogleAuthProvider>
             </ToastProvider>
           </QueryProvider>

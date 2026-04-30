@@ -2,6 +2,7 @@
 
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 import { AuthShell } from "@/components/layout/AuthShell";
 import { useSendOtp, useVerifyOtp } from "@/hooks/queries/useAuth";
@@ -12,10 +13,17 @@ function OTPPageContent() {
     const searchParams = useSearchParams();
     const phone = searchParams.get("phone") ?? "";
 
-    const [otp, setOtp] = useState(["", "", "", ""]);
+    const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const [timer, setTimer] = useState(119);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const inputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
+    const inputRefs = [
+        useRef<HTMLInputElement>(null),
+        useRef<HTMLInputElement>(null),
+        useRef<HTMLInputElement>(null),
+        useRef<HTMLInputElement>(null),
+        useRef<HTMLInputElement>(null),
+        useRef<HTMLInputElement>(null),
+    ];
 
     const verifyOtp = useVerifyOtp();
     const sendOtp = useSendOtp();
@@ -49,7 +57,7 @@ function OTPPageContent() {
         newOtp[index] = value;
         setOtp(newOtp);
 
-        if (value && index < 3) {
+        if (value && index < 5) {
             inputRefs[index + 1].current?.focus();
         }
     };
@@ -88,23 +96,36 @@ function OTPPageContent() {
         );
     };
 
-    const handleResend = () => {
+    const { executeRecaptcha } = useGoogleReCaptcha();
+
+    const handleResend = async () => {
         if (!phone || timer > 0 || sendOtp.isPending) return;
+
+        if (!executeRecaptcha) {
+            setErrorMessage("reCAPTCHA is not ready.");
+            return;
+        }
+
         setErrorMessage(null);
 
-        sendOtp.mutate(
-            { phone },
-            {
-                onSuccess: () => setTimer(119),
-                onError: (err) => {
-                    setErrorMessage(
-                        err instanceof ApiError
-                          ? err.message
-                          : "Failed to resend code.",
-                    );
+        try {
+            const captchaToken = await executeRecaptcha("resend_otp");
+            sendOtp.mutate(
+                { phone, captcha: captchaToken },
+                {
+                    onSuccess: () => setTimer(119),
+                    onError: (err) => {
+                        setErrorMessage(
+                            err instanceof ApiError
+                                ? err.message
+                                : "Failed to resend code.",
+                        );
+                    },
                 },
-            },
-        );
+            );
+        } catch (error) {
+            setErrorMessage("reCAPTCHA execution failed.");
+        }
     };
 
     const verifying = verifyOtp.isPending;
@@ -119,7 +140,7 @@ function OTPPageContent() {
                 </h1>
 
                 <p className="w-full text-center text-[16px] font-normal leading-6 text-[#64748B]">
-                    We&apos;ve sent a 4-digit verification code to your phone number ending in ****{phoneTail}.
+                    We&apos;ve sent a 6-digit verification code to your phone number ending in ****{phoneTail}.
                 </p>
 
                 <form onSubmit={handleVerify} className="flex w-full flex-col items-center gap-6">

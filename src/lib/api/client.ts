@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import Cookies from "js-cookie";
 
 import { apiConfig } from "./config";
 import { normalizeAxiosError } from "./errors";
@@ -19,13 +20,22 @@ const createApiClient = (): AxiosInstance => {
     baseURL: apiConfig.baseUrl,
     timeout: apiConfig.timeoutMs,
     headers: { "Content-Type": "application/json" },
-    withCredentials: true,
+  });
+
+  instance.interceptors.request.use((config) => {
+    const token = Cookies.get("m_at");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
   });
 
   instance.interceptors.response.use(
     (response) => response,
     (error) => {
       if (error.response?.status === 401) {
+        Cookies.remove("m_at");
+        Cookies.remove("m_rt");
         redirectToLogin();
       }
       return Promise.reject(normalizeAxiosError(error));
