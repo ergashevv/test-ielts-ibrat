@@ -40,15 +40,15 @@ export function useCompletedSteps(courseId: CourseId): string[] {
   const { data: lessons } = useLessons(practicumId, moduleId);
 
   return useMemo(() => {
-    const apiLessons = (lessons as any) ?? [];
+    const apiLessons = (lessons as any[]) ?? [];
     const effectiveSteps = getEffectiveSteps(courseId);
 
     const apiCompleted: string[] = [];
-    apiLessons.forEach((lesson, idx) => {
+    apiLessons.forEach((lesson: any, idx: number) => {
       const stepId = effectiveSteps[idx];
       if (stepId && lesson.completed) apiCompleted.push(stepId);
     });
 
     return apiCompleted;
-  }, [courseId, lessonsPage]);
+  }, [courseId, lessons]);
 }
